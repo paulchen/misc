@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import ntpath, os.path, urllib, argparse, datetime
+import ntpath, os.path, urllib, argparse, datetime, re
 
 from urllib.request import urlopen
 from xml.etree import ElementTree
@@ -23,6 +23,9 @@ resolutions = [ '1920x1080', '1080x1920' ]
 
 print(datetime.datetime.now())
 
+regex1 = re.compile(r"th\?id=OHR\.")
+regex2 = re.compile(r"_[0-9]*_[0-9]*x[0-9]*\.jpg")
+
 for market in markets:
     print(market)
     for index in indices:
@@ -42,6 +45,8 @@ for market in markets:
 
                 jpg_url = jpg_url_prefix + image.find('urlBase').text + '_' + resolution + '.jpg'
                 filename = base_dir + resolution + '/' + ntpath.basename(jpg_url).replace(market.upper(), '').replace('ROW', '')
+                filename = regex1.sub("", filename)
+                filename = regex2.sub(".jpg", filename)
 
                 if not os.path.isfile(filename):
                     print(jpg_url)

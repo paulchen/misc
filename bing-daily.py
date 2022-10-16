@@ -1,10 +1,24 @@
 #!/usr/bin/python3
 
-import ntpath, os.path, urllib, argparse, datetime, re
+import ntpath, os.path, urllib, argparse, datetime, re, time, sys
 
 from urllib.request import urlopen
 from xml.etree import ElementTree
 from subprocess import call
+
+
+def download(url):
+    wait_times = [ 0, 30, 300, 900 ]
+    for wait_time in wait_times:
+        print(f'Sleeping {wait_time} seconds')
+        time.sleep(wait_time)
+        try:
+            return urlopen(url)
+        except urllib.error.HTTPError as e:
+            print(f'HTTP error {e.code} received: {e.reason}')
+    print('Too many errors, giving up now')
+    sys.exit(1)
+
 
 parser = argparse.ArgumentParser(description='Downloads the daily wallpapers from bing.com')
 parser.add_argument('-d', required=True, help='Target directory')
@@ -32,7 +46,7 @@ for market in markets:
         print(index)
         url = base_url % (index, market)
 
-        root = ElementTree.parse(urlopen(url)).getroot()
+        root = ElementTree.parse(download(url)).getroot()
 
         for image in root.findall('image'):
             copyright = image.find('copyright').text

@@ -45,8 +45,13 @@ for market in markets:
     for index in indices:
         print(index)
         url = base_url % (index, market)
+        print(url)
 
-        root = ElementTree.parse(download(url)).getroot()
+        try:
+            root = ElementTree.parse(download(url)).getroot()
+        except Exception as e:
+            print('Unable to download and parse data: ', e)
+            continue
 
         for image in root.findall('image'):
             copyright = image.find('copyright').text
